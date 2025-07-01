@@ -10,9 +10,10 @@ interface PrayerTimesProps {
     maghrib: boolean;
     isha: boolean;
   };
+  reminderInterval: number;
 }
 
-export const PrayerTimes = ({ prayerSettings }: PrayerTimesProps) => {
+export const PrayerTimes = ({ prayerSettings, reminderInterval }: PrayerTimesProps) => {
   const [showReminders, setShowReminders] = useState(false);
 
   const prayers = [
@@ -33,7 +34,7 @@ export const PrayerTimes = ({ prayerSettings }: PrayerTimesProps) => {
           >
             ← العودة
           </button>
-          <h2 className="text-xl font-semibold text-islamic-green">تذكير بمواعيد الصلاة</h2>
+          <h2 className="text-xl font-semibold text-islamic-green">بعد أوقات الصلاة</h2>
         </div>
 
         <div className="prayer-card rounded-2xl p-6 space-y-4">
@@ -47,6 +48,12 @@ export const PrayerTimes = ({ prayerSettings }: PrayerTimesProps) => {
             <div className="w-12 h-12 bg-islamic-green rounded-full flex items-center justify-center">
               <span className="text-white text-lg">💚</span>
             </div>
+          </div>
+
+          <div className="mb-4 p-3 bg-islamic-green/10 rounded-lg">
+            <p className="text-sm text-islamic-brown text-center">
+              التذكير بعد {reminderInterval} دقيقة من الصلاة
+            </p>
           </div>
 
           {prayers.map((prayer) => (
@@ -89,7 +96,7 @@ export const PrayerTimes = ({ prayerSettings }: PrayerTimesProps) => {
             </div>
           </div>
           <p className="text-islamic-brown font-medium">
-            تذكير بمواعيد الصلاة
+            بعد أوقات الصلاة
           </p>
         </button>
       </div>

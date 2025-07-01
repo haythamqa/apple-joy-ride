@@ -1,10 +1,18 @@
 
 interface PrayerHeaderProps {
   currentTime: Date;
+  timeFormat: '12h' | '24h';
 }
 
-export const PrayerHeader = ({ currentTime }: PrayerHeaderProps) => {
+export const PrayerHeader = ({ currentTime, timeFormat }: PrayerHeaderProps) => {
   const formatTime = (date: Date) => {
+    if (timeFormat === '12h') {
+      return date.toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
     return date.toLocaleTimeString('ar-SA', {
       hour: '2-digit',
       minute: '2-digit',

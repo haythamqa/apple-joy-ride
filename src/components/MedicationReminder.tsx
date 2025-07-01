@@ -3,21 +3,45 @@ import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 
-export const MedicationReminder = () => {
+interface MedicationReminderProps {
+  appSettings: {
+    timeFormat: '12h' | '24h';
+    reminderInterval: number;
+    alertSound: string;
+    fontSize: 'small' | 'medium' | 'large';
+  };
+}
+
+export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => {
   const [medications, setMedications] = useState([
     {
       id: 1,
       name: 'أ ملوديبيين',
-      time: '09:00 ص',
-      enabled: true
+      time: '09:00',
+      enabled: true,
+      interval: null,
+      dailyCount: 1
     }
   ]);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMedication, setNewMedication] = useState({
     name: '',
-    time: '09:00'
+    time: '09:00',
+    interval: null as number | null,
+    dailyCount: 1
   });
+
+  const formatTime = (time: string) => {
+    if (appSettings.timeFormat === '12h') {
+      const [hours, minutes] = time.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'م' : 'ص';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
+    return time;
+  };
 
   const handleAddMedication = () => {
     if (newMedication.name.trim()) {
@@ -26,11 +50,13 @@ export const MedicationReminder = () => {
         {
           id: Date.now(),
           name: newMedication.name,
-          time: newMedication.time + ' ص',
-          enabled: true
+          time: newMedication.time,
+          enabled: true,
+          interval: newMedication.interval,
+          dailyCount: newMedication.dailyCount
         }
       ]);
-      setNewMedication({ name: '', time: '09:00' });
+      setNewMedication({ name: '', time: '09:00', interval: null, dailyCount: 1 });
       setShowAddForm(false);
     }
   };
@@ -66,7 +92,10 @@ export const MedicationReminder = () => {
                   {medication.name}
                 </div>
                 <div className="text-sm text-islamic-green">
-                  {medication.time}
+                  {medication.interval 
+                    ? `كل ${medication.interval} ساعات`
+                    : `${formatTime(medication.time)} ${medication.dailyCount > 1 ? `(${medication.dailyCount} مرات يومياً)` : ''}`
+                  }
                 </div>
               </div>
             </div>
@@ -82,12 +111,85 @@ export const MedicationReminder = () => {
               onChange={(e) => setNewMedication({ ...newMedication, name: e.target.value })}
               className="w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown placeholder-islamic-brown/60 text-right"
             />
-            <input
-              type="time"
-              value={newMedication.time}
-              onChange={(e) => setNewMedication({ ...newMedication, time: e.target.value })}
-              className="w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown text-right"
-            />
+            
+            <div className="space-y-2">
+              <label className="text-islamic-brown font-medium">نوع التذكير</label>
+              <div className="flex space-x-2 space-x-reverse">
+                <Button
+                  onClick={() => setNewMedication({ ...newMedication, interval: null })}
+                  variant={newMedication.interval === null ? 'default' : 'outline'}
+                  className={`flex-1 ${
+                    newMedication.interval === null 
+                      ? 'bg-islamic-green hover:bg-islamic-green-light text-white' 
+                      : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
+                  }`}
+                >
+                  وقت محدد
+                </Button>
+                <Button
+                  onClick={() => setNewMedication({ ...newMedication, interval: 6 })}
+                  variant={newMedication.interval !== null ? 'default' : 'outline'}
+                  className={`flex-1 ${
+                    newMedication.interval !== null 
+                      ? 'bg-islamic-green hover:bg-islamic-green-light text-white' 
+                      : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
+                  }`}
+                >
+                  كل X ساعات
+                </Button>
+              </div>
+            </div>
+
+            {newMedication.interval === null ? (
+              <>
+                <input
+                  type="time"
+                  value={newMedication.time}
+                  onChange={(e) => setNewMedication({ ...newMedication, time: e.target.value })}
+                  className="w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown text-right"
+                />
+                <div className="space-y-2">
+                  <label className="text-islamic-brown font-medium">مرات في اليوم</label>
+                  <div className="flex space-x-2 space-x-reverse">
+                    {[1, 2, 3, 4].map((count) => (
+                      <Button
+                        key={count}
+                        onClick={() => setNewMedication({ ...newMedication, dailyCount: count })}
+                        variant={newMedication.dailyCount === count ? 'default' : 'outline'}
+                        className={`flex-1 ${
+                          newMedication.dailyCount === count 
+                            ? 'bg-islamic-green hover:bg-islamic-green-light text-white' 
+                            : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
+                        }`}
+                      >
+                        {count}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-islamic-brown font-medium">كل كم ساعة</label>
+                <div className="flex space-x-2 space-x-reverse">
+                  {[4, 6, 8, 12].map((interval) => (
+                    <Button
+                      key={interval}
+                      onClick={() => setNewMedication({ ...newMedication, interval })}
+                      variant={newMedication.interval === interval ? 'default' : 'outline'}
+                      className={`flex-1 ${
+                        newMedication.interval === interval 
+                          ? 'bg-islamic-green hover:bg-islamic-green-light text-white' 
+                          : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
+                      }`}
+                    >
+                      {interval}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex space-x-2 space-x-reverse">
               <Button
                 onClick={handleAddMedication}
