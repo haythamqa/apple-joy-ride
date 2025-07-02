@@ -20,7 +20,8 @@ const Index = () => {
     timeFormat: '24h' as '12h' | '24h',
     reminderInterval: 15,
     alertSound: 'default',
-    fontSize: 'medium' as 'small' | 'medium' | 'large'
+    fontSize: 'medium' as 'small' | 'medium' | 'large',
+    language: 'ar' as 'ar' | 'en'
   });
 
   useEffect(() => {
@@ -47,8 +48,8 @@ const Index = () => {
       default:
         return (
           <div className="space-y-6">
-            <PrayerHeader currentTime={currentTime} timeFormat={appSettings.timeFormat} />
-            <PrayerTimes prayerSettings={prayerSettings} reminderInterval={appSettings.reminderInterval} />
+            <PrayerHeader currentTime={currentTime} timeFormat={appSettings.timeFormat} appSettings={appSettings} />
+            <PrayerTimes prayerSettings={prayerSettings} reminderInterval={appSettings.reminderInterval} appSettings={appSettings} />
           </div>
         );
     }
@@ -60,7 +61,7 @@ const Index = () => {
         <div className="p-6 pb-24">
           {renderContent()}
         </div>
-        <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} appSettings={appSettings} />
       </div>
     </div>
   );

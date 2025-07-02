@@ -2,13 +2,30 @@
 interface BottomNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  appSettings: {
+    language: 'ar' | 'en';
+  };
 }
 
-export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => {
+export const BottomNavigation = ({ activeTab, onTabChange, appSettings }: BottomNavigationProps) => {
+  const isArabic = appSettings.language === 'ar';
+
   const tabs = [
-    { id: 'home', label: 'الرئيسية', icon: '🏠' },
-    { id: 'settings', label: 'الإعدادات', icon: '⚙️' },
-    { id: 'medication', label: 'الأدوية', icon: '💊' },
+    { 
+      id: 'home', 
+      label: isArabic ? 'الرئيسية' : 'Home', 
+      icon: '🏠' 
+    },
+    { 
+      id: 'settings', 
+      label: isArabic ? 'الإعدادات' : 'Settings', 
+      icon: '⚙️' 
+    },
+    { 
+      id: 'medication', 
+      label: isArabic ? 'الأدوية' : 'Medication', 
+      icon: '💊' 
+    },
   ];
 
   return (

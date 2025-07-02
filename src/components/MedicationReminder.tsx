@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ interface MedicationReminderProps {
     reminderInterval: number;
     alertSound: string;
     fontSize: 'small' | 'medium' | 'large';
+    language: 'ar' | 'en';
   };
 }
 
@@ -31,6 +31,43 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
     interval: null as number | null,
     dailyCount: 1
   });
+
+  const isArabic = appSettings.language === 'ar';
+
+  const texts = {
+    ar: {
+      settings: 'الإعدادات',
+      medicationReminder: 'تذكير الدواء',
+      addMedication: 'إضافة دواء',
+      medicationName: 'اسم الدواء',
+      reminderType: 'نوع التذكير',
+      specificTime: 'وقت محدد',
+      everyXHours: 'كل X ساعات',
+      timesPerDay: 'مرات في اليوم',
+      everyHowManyHours: 'كل كم ساعة',
+      add: 'إضافة',
+      cancel: 'إلغاء',
+      everyHours: 'كل X ساعات',
+      timesDaily: 'مرات يومياً'
+    },
+    en: {
+      settings: 'Settings',
+      medicationReminder: 'Medication Reminder',
+      addMedication: 'Add Medication',
+      medicationName: 'Medication Name',
+      reminderType: 'Reminder Type',
+      specificTime: 'Specific Time',
+      everyXHours: 'Every X Hours',
+      timesPerDay: 'Times Per Day',
+      everyHowManyHours: 'Every How Many Hours',
+      add: 'Add',
+      cancel: 'Cancel',
+      everyHours: 'Every X Hours',
+      timesDaily: 'Times Daily'
+    }
+  };
+
+  const t = texts[appSettings.language];
 
   const formatTime = (time: string) => {
     if (appSettings.timeFormat === '12h') {
@@ -68,20 +105,20 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className={`space-y-6 animate-fade-in ${isArabic ? 'text-right' : 'text-left'}`} dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-islamic-green mb-2">الإعدادات</h1>
-        <p className="text-islamic-brown">تذكير الدواء</p>
+        <h1 className="text-2xl font-bold text-islamic-green mb-2">{t.settings}</h1>
+        <p className="text-islamic-brown">{t.medicationReminder}</p>
       </div>
 
       <div className="prayer-card rounded-2xl p-6 space-y-4">
         <h2 className="text-xl font-semibold text-islamic-green border-b border-islamic-green/20 pb-2">
-          تذكير الدواء
+          {t.medicationReminder}
         </h2>
 
         {medications.map((medication) => (
           <div key={medication.id} className="flex items-center justify-between py-3 border-b border-islamic-green/10 last:border-b-0">
-            <div className="flex items-center space-x-3 space-x-reverse">
+            <div className={`flex items-center space-x-3 ${isArabic ? 'space-x-reverse' : ''}`}>
               <Switch
                 checked={medication.enabled}
                 onCheckedChange={() => toggleMedication(medication.id)}
@@ -93,8 +130,8 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
                 </div>
                 <div className="text-sm text-islamic-green">
                   {medication.interval 
-                    ? `كل ${medication.interval} ساعات`
-                    : `${formatTime(medication.time)} ${medication.dailyCount > 1 ? `(${medication.dailyCount} مرات يومياً)` : ''}`
+                    ? `${isArabic ? 'كل' : 'Every'} ${medication.interval} ${isArabic ? 'ساعات' : 'hours'}`
+                    : `${formatTime(medication.time)} ${medication.dailyCount > 1 ? `(${medication.dailyCount} ${isArabic ? 'مرات يومياً' : 'times daily'})` : ''}`
                   }
                 </div>
               </div>
@@ -106,15 +143,15 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
           <div className="space-y-4 p-4 bg-white/30 rounded-lg border border-islamic-green/20">
             <input
               type="text"
-              placeholder="اسم الدواء"
+              placeholder={t.medicationName}
               value={newMedication.name}
               onChange={(e) => setNewMedication({ ...newMedication, name: e.target.value })}
-              className="w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown placeholder-islamic-brown/60 text-right"
+              className={`w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown placeholder-islamic-brown/60 ${isArabic ? 'text-right' : 'text-left'}`}
             />
             
             <div className="space-y-2">
-              <label className="text-islamic-brown font-medium">نوع التذكير</label>
-              <div className="flex space-x-2 space-x-reverse">
+              <label className="text-islamic-brown font-medium">{t.reminderType}</label>
+              <div className={`flex space-x-2 ${isArabic ? 'space-x-reverse' : ''}`}>
                 <Button
                   onClick={() => setNewMedication({ ...newMedication, interval: null })}
                   variant={newMedication.interval === null ? 'default' : 'outline'}
@@ -124,7 +161,7 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
                       : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
                   }`}
                 >
-                  وقت محدد
+                  {t.specificTime}
                 </Button>
                 <Button
                   onClick={() => setNewMedication({ ...newMedication, interval: 6 })}
@@ -135,7 +172,7 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
                       : 'border-islamic-green text-islamic-green hover:bg-islamic-green/10'
                   }`}
                 >
-                  كل X ساعات
+                  {t.everyXHours}
                 </Button>
               </div>
             </div>
@@ -146,11 +183,11 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
                   type="time"
                   value={newMedication.time}
                   onChange={(e) => setNewMedication({ ...newMedication, time: e.target.value })}
-                  className="w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown text-right"
+                  className={`w-full p-3 rounded-lg border border-islamic-green/30 bg-white/50 text-islamic-brown ${isArabic ? 'text-right' : 'text-left'}`}
                 />
                 <div className="space-y-2">
-                  <label className="text-islamic-brown font-medium">مرات في اليوم</label>
-                  <div className="flex space-x-2 space-x-reverse">
+                  <label className="text-islamic-brown font-medium">{t.timesPerDay}</label>
+                  <div className={`flex space-x-2 ${isArabic ? 'space-x-reverse' : ''}`}>
                     {[1, 2, 3, 4].map((count) => (
                       <Button
                         key={count}
@@ -170,8 +207,8 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
               </>
             ) : (
               <div className="space-y-2">
-                <label className="text-islamic-brown font-medium">كل كم ساعة</label>
-                <div className="flex space-x-2 space-x-reverse">
+                <label className="text-islamic-brown font-medium">{t.everyHowManyHours}</label>
+                <div className={`flex space-x-2 ${isArabic ? 'space-x-reverse' : ''}`}>
                   {[4, 6, 8, 12].map((interval) => (
                     <Button
                       key={interval}
@@ -190,34 +227,34 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
               </div>
             )}
 
-            <div className="flex space-x-2 space-x-reverse">
+            <div className={`flex space-x-2 ${isArabic ? 'space-x-reverse' : ''}`}>
               <Button
                 onClick={handleAddMedication}
                 className="flex-1 bg-islamic-green hover:bg-islamic-green-light text-white"
               >
-                إضافة
+                {t.add}
               </Button>
               <Button
                 onClick={() => setShowAddForm(false)}
                 variant="outline"
                 className="flex-1 border-islamic-green text-islamic-green hover:bg-islamic-green/10"
               >
-                إلغاء
+                {t.cancel}
               </Button>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setShowAddForm(true)}
-            className="w-full p-4 border-2 border-dashed border-islamic-green/40 rounded-lg text-islamic-green hover:bg-islamic-green/5 transition-colors flex items-center justify-center space-x-2 space-x-reverse"
+            className={`w-full p-4 border-2 border-dashed border-islamic-green/40 rounded-lg text-islamic-green hover:bg-islamic-green/5 transition-colors flex items-center justify-center space-x-2 ${isArabic ? 'space-x-reverse' : ''}`}
           >
             <span className="text-2xl">+</span>
-            <span className="font-medium">إضافة دواء</span>
+            <span className="font-medium">{t.addMedication}</span>
           </button>
         )}
       </div>
 
-      {/* App Logo */}
+      {/* App Logo - Removed green heart icon */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center space-x-2 space-x-reverse">
           <div className="w-8 h-8 bg-islamic-green rounded-full flex items-center justify-center">
@@ -226,9 +263,6 @@ export const MedicationReminder = ({ appSettings }: MedicationReminderProps) => 
           <h3 className="text-lg font-bold text-islamic-green font-amiri">
             صديقي
           </h3>
-          <div className="w-8 h-8 bg-islamic-green rounded-full flex items-center justify-center">
-            <span className="text-white text-sm">💚</span>
-          </div>
         </div>
       </div>
     </div>
